@@ -21,7 +21,7 @@ SYNOPSIS
 DESCRIPTION
        pd.py is a script written using Python 3.8 that downloads the publication(s) specified by the options shown above.
        The `pub` option is mandatory and must always be supplied. All other options will be set to their default values
-       if they are not provided explicitly.
+       if they are not provided explicitly or if the ones provided are faulty.
 
 OPTIONS
        A summary of the available options is included below.
@@ -130,10 +130,12 @@ def get_resource_links():
 
         if type(response) == list:
             # [{"id": "some-uuid", "title": "Not found", "status": 404}]
-            print(f"{options['pub']} {options['year']}/{options['month']} in the language {options['lang']} and "
-                  f"file format {options['ftype']} does not exist.")
+            print(f"{options['pub']} {options['year']}/{month}  language: {options['lang']}  "
+                  f"format: {options['ftype']} - does not exist.")
         else:
-            download_links.append(response['files'][options['lang']][options['ftype']][0]['file']['url'])
+            pub_link = response['files'][options['lang']][options['ftype']][0]['file']['url']
+            print(f"{options['pub']} {options['year']}/{month} download link: {pub_link}")
+            download_links.append(pub_link)
 
     return download_links
 
