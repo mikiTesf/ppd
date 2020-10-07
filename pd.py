@@ -200,4 +200,10 @@ options['cont'] = 'false'
 # supplied by the user are faulty, the default values set before `collect_options(...)` is called are used
 options = collect_options(args)
 
-download_links = get_resource_links()
+# The following check is important because even though options were supplied, the `pub` option may still not be
+# supplied (ex. invoking `python pd.py year=2017 month=7 lang=am`)
+if options['pub'] is None:
+    print(HELP)
+    exit(0)
+
+download_publications(get_resource_links())
