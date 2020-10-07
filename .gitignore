@@ -1,2 +1,9 @@
 pd/
 downloads/
+.idea/
+sample_mwb/
+*pdf
+*epub
+*jwpub
+*rtf
+*zip
