@@ -44,7 +44,7 @@ OPTIONS
 
 EXAMPLES
        Executing the command below will not download any publication as `pub` is not supplied.
-       % python3.x pd.py year=2010 month=2 ftype=pdf lang=en
+       % python3.x pd.py year=2010 month=2 ftype=pdf lang=e
 
        This will download the Awake of February 2010 in the PDF format and the English language
        % python3.x pd.py year=2010 month=2 ftype=pdf lang=e pub=g
@@ -78,14 +78,14 @@ def collect_options(args_list):
 
         match = re.match('ftype=([a-z]+)', arg, re.IGNORECASE)
         if match:
-            ftype = match.group(1)
-            if ftype.upper() in FILE_TYPES:
+            ftype = match.group(1).upper()
+            if ftype in FILE_TYPES:
                 options['ftype'] = ftype
             continue
 
         match = re.match('lang=([a-z]+)', arg, re.IGNORECASE)
         if match:
-            options['lang'] = match.group(1)
+            options['lang'] = match.group(1).upper()
             continue
 
         match = re.match('cont=(true|false)', arg, re.IGNORECASE)
