@@ -1,7 +1,11 @@
-from requests import get
+import requests
 from datetime import datetime
 import re
 from sys import argv
+from os import mkdir
+from os.path import exists
+
+import wget
 
 
 options = dict()
@@ -123,25 +127,57 @@ def get_resource_links():
         months.extend(get_subsequent_months(months[0]))
 
     for month in months:
+        publication_identifier = f"{options['pub']} {options['year']}/{month}"
         request_url = f"https://pubmedia.jw-api.org/GETPUBMEDIALINKS?issue={options['year']}{month}&output=json" \
                       f"&pub={options['pub']}&fileformat={options['ftype']}%2CEPUB%2CJWPUB%2CRTF%2CTXT%2CBRL%2CBES%2CDAISY" \
                       f"&alllangs=0&langwritten={options['lang']}&txtCMSLang={options['lang']}"
-        response = get(request_url).json()
-
-        if type(response) == list:
-            # [{"id": "some-uuid", "title": "Not found", "status": 404}]
-            print(f"{options['pub']} {options['year']}/{month}  language: {options['lang']}  "
-                  f"format: {options['ftype']} - does not exist.")
+        try:
+            response = requests.get(request_url).json()
+        except KeyboardInterrupt:
+            print('Download interrupted. Exiting...')
+            exit(0)
+        except requests.exceptions.Timeout:
+            print(f'There was a request timeout. {publication_identifier} not downloaded. '
+                  'Attempting to download the next publication...')
+            continue
+        except requests.exceptions.ConnectionError:
+            print('Could not connect to the internet. Exiting...')
+            exit(0)
         else:
-            pub_link = response['files'][options['lang']][options['ftype']][0]['file']['url']
-            print(f"{options['pub']} {options['year']}/{month} download link: {pub_link}")
-            download_links.append(pub_link)
+            if type(response) == list:
+                # [{"id": "some-uuid", "title": "Not found", "status": 404}]
+                print(f"{publication_identifier} {options['lang']}  "
+                      f"format: {options['ftype']} - does not exist.")
+            else:
+                available_formats = list(response['files'][options['lang']].keys())
+
+                if options['ftype'] in available_formats:
+                    pub_link = response['files'][options['lang']][options['ftype']][0]['file']['url']
+                    print(f"{publication_identifier} download link: {pub_link}")
+                    download_links.append(pub_link)
+                else:
+                    print(f"{publication_identifier} is available in the following format(s): {available_formats}")
 
     return download_links
 
 
 def download_publications(download_links: list):
-    pass
+    downloads_directory_name = 'downloads'
+
+    if not exists(downloads_directory_name):
+        mkdir(downloads_directory_name)
+
+    print('###################################################################################################')
+
+    for link in download_links:
+        print(f"downloading: {link[link.rindex('/') + 1:]}")
+        try:
+            wget.download(link, out=downloads_directory_name)
+        except KeyboardInterrupt:
+            print('Download interrupted. Exiting...')
+            exit(0)
+        print()  # An empty line inserted to prevent progress bars from overlapping over one another
+    print('done...')
 
 
 args = argv[1:]
@@ -159,6 +195,7 @@ options['pub'] = None
 options['ftype'] = 'JWPUB'
 options['lang'] = 'AM'
 options['cont'] = 'false'
+
 # On the following line, the default options will be replaced with those passed by the user. If any of the options
 # supplied by the user are faulty, the default values set before `collect_options(...)` is called are used
 options = collect_options(args)
