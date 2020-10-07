@@ -51,12 +51,44 @@ def collect_options(args_list):
     return options
 
 
-def get_resource_link(url: str):
-    response = get(url)
-    pass
+def get_subsequent_months(current_month: str):
+    current_month = int(current_month)
+    subsequent_months = []
+
+    if (current_month > 12) or (current_month < 1):
+        return subsequent_months  # which will be empty at this point
+
+    while (current_month + 1) < 13:
+        current_month += 1
+        subsequent_months.append(zero_pad_month(str(current_month)))
+
+    return subsequent_months
 
 
-def download_publication(url: str):
+def get_resource_links():
+    download_links = []
+    months = [options['month']]
+
+    if options['cont'] == 'true':
+        months.extend(get_subsequent_months(months[0]))
+
+    for month in months:
+        request_url = f"https://pubmedia.jw-api.org/GETPUBMEDIALINKS?issue={options['year']}{month}&output=json" \
+                      f"&pub={options['pub']}&fileformat={options['ftype']}%2CEPUB%2CJWPUB%2CRTF%2CTXT%2CBRL%2CBES%2CDAISY" \
+                      f"&alllangs=0&langwritten={options['lang']}&txtCMSLang={options['lang']}"
+        response = get(request_url).json()
+
+        if type(response) == list:
+            # [{"id": "some-uuid", "title": "Not found", "status": 404}]
+            print(f"{options['pub']} {options['year']}/{options['month']} in the language {options['lang']} and "
+                  f"file format {options['ftype']} does not exist.")
+        else:
+            download_links.append(response['files'][options['lang']][options['ftype']][0]['file']['url'])
+
+    return download_links
+
+
+def download_publications(download_links: list):
     pass
 
 
@@ -75,21 +107,8 @@ options['pub'] = None
 options['ftype'] = 'JWPUB'
 options['lang'] = 'AM'
 options['cont'] = 'false'
-
+# On the following line, the default options will be replaced with those passed by the user. If any of the options
+# supplied by the user are faulty, the default values set before `collect_options(...)` is called are used
 options = collect_options(args)
 
-request_url = f"https://pubmedia.jw-api.org/GETPUBMEDIALINKS?issue={options['year']}{options['month']}&output=json" \
-              f"&pub={options['pub']}&fileformat={options['ftype']}%2CEPUB%2CJWPUB%2CRTF%2CTXT%2CBRL%2CBES%2CDAISY" \
-              f"&alllangs=0&langwritten={options['lang']}&txtCMSLang={options['lang']}"
-
-
-def download_publication(url: str):
-    pass
-
-
-request_url = f'https://pubmedia.jw-api.org/GETPUBMEDIALINKS?issue={year}{month}&output=json'\
-               f'&pub={pub}&fileformat={ftype}%2CEPUB%2CJWPUB%2CRTF%2CTXT%2CBRL%2CBES%2CDAISY'\
-               f'&alllangs=0&langwritten={lang}&txtCMSLang={lang}'
-
-response = get(request_url)
-print(response.json())
+download_links = get_resource_links()
