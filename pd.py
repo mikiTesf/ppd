@@ -2,8 +2,8 @@ import requests
 from datetime import datetime
 import re
 from sys import argv
-from os import mkdir
-from os.path import exists
+from os import makedirs
+from os.path import join, abspath, exists
 
 import wget
 
@@ -13,8 +13,8 @@ FILE_TYPES = ['PDF', 'EPUB', 'JWPUB', 'RTF']
 
 HELP = """
 NAME
-       pd (short for "pub downloader") - Download any periodic JW publication(s) (g, wp, w, mwb) in any format from the
-       command line
+       pd (short for "pub downloader") - Download any periodic JW publication(s) (g, wp, w, mwb) in any
+       format from the command line
 
 SYNOPSIS
        python3.x pd.py [year=YEAR; default=current] [month=MONTH; default=current]
@@ -23,26 +23,27 @@ SYNOPSIS
        python3.x pd.py [-h|--help]
 
 DESCRIPTION
-       pd.py is a script written using Python 3.8 that downloads the publication(s) specified by the options shown above.
-       The `pub` option is mandatory and must always be supplied. All other options will be set to their default values
-       if they are not provided explicitly or if the ones provided are faulty.
+       pd.py is a script written using Python 3.8 that downloads the publication(s) specified by the options
+       shown above. The `pub` option is mandatory and must always be supplied. All other options will be set
+       to their default values if they are not provided explicitly or if the ones provided are faulty.
 
 OPTIONS
        A summary of the available options is included below.
 
-       year        The year of the issue (default to the current year)
+       year        The year of the issue (defaults to the current year)
 
        month       The month of the issue (defaults to the current month)
 
        ftype       The file format of the download (PDF, JWPUB, EPUB or RTF; it defaults to JWPUB)
 
-       lang        The short language code of the target language (ex: AM for Amharic, E for English, etc.)
+       lang        The short language code of the target language - AM for Amharic, E for English, etc.
+                   (defaults to AM)
 
-       cont        Decides weather the script should continue downloading releases of the specified publication
-                   until the end of the year (can be set to true or false; defaults to false). See examples below.
+       cont        Decides weather the script should continue downloading releases of the specified
+                   publication until the end of the year (can be set to true or false; defaults to false).
 
-       pub         The type of the "periodic" publication to download (w, wp, g, mwb; must always be supplied). If
-                   this option is not supplied this help will be shown instead.
+       pub         The type of the "periodic" publication to download (w, wp, g, mwb; this option is mandatory).
+                   If this option is not supplied this help will be shown instead.
 
        -h, --help  Display this help and exit
 
@@ -50,14 +51,15 @@ EXAMPLES
        Executing the command below will not download any publication as `pub` is not supplied.
        % python3.x pd.py year=2010 month=2 ftype=pdf lang=e
 
-       This will download the Awake of February 2010 in the PDF format and the English language
+       This will download the Awake of February 2010 in the PDF format and the English language.
        % python3.x pd.py year=2010 month=2 ftype=pdf lang=e pub=g
 
-       This will download the Public Watchtower of the current year and month in the EPUB format and the Arabic language
+       This will download the Public Watchtower of the current year and month in the EPUB format and the Arabic
+       language.
        % python3.x pd.py ftype=epub lang=a pub=wp
 
        This will download all Meeting Workbook issues from January 2018 up to December 2018 in the JWPUB format
-       and the Amharic language (note that `cont` is set to true)
+       and the Amharic language (note that `cont` is set to true).
        % python3.x pd.py year=2018 month=1 ftype=jwpub lang=am pub=mwb cont=true
 """
 
@@ -162,22 +164,28 @@ def get_resource_links():
 
 
 def download_publications(download_links: list):
-    downloads_directory_name = 'downloads'
-
-    if not exists(downloads_directory_name):
-        mkdir(downloads_directory_name)
+    download_path = join('downloads', options['pub'], options['lang'])
+    makedirs(download_path, exist_ok=True)
 
     print('###################################################################################################')
 
     for link in download_links:
-        print(f"downloading: {link[link.rindex('/') + 1:]}")
+        file_name = link[link.rindex('/') + 1:]
+
+        if exists(join(download_path, file_name)):
+            print(f"'{file_name}' already exists. Skipping...")
+            continue
+
+        print(f"downloading: {file_name}")
+
         try:
-            wget.download(link, out=downloads_directory_name)
+            wget.download(link, out=download_path)
         except KeyboardInterrupt:
             print('Download interrupted. Exiting...')
             exit(0)
         print()  # An empty line inserted to prevent progress bars from overlapping over one another
-    print('done...')
+
+    print('done...', f"all downloads saved to '{abspath(download_path)}'")
 
 
 args = argv[1:]
