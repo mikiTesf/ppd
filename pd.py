@@ -158,13 +158,13 @@ def get_resource_links():
                     print(f"{publication_identifier} download link: {pub_link}")
                     download_links.append(pub_link)
                 else:
-                    print(f"{publication_identifier} is available in the following format(s): {available_formats}")
+                    print(f"{publication_identifier} available format(s): {available_formats}")
 
     return download_links
 
 
 def download_publications(download_links: list):
-    download_path = join('downloads', options['pub'], options['lang'])
+    download_path = join('downloads', options['pub'], options['lang'], options['year'])
     makedirs(download_path, exist_ok=True)
 
     print('###################################################################################################')
@@ -185,7 +185,8 @@ def download_publications(download_links: list):
             exit(0)
         print()  # An empty line inserted to prevent progress bars from overlapping over one another
 
-    print('done...', f"all downloads saved to '{abspath(download_path)}'")
+    if len(download_links) > 0:
+        print('done...', f"all downloads saved to '{abspath(download_path)}'")
 
 
 args = argv[1:]
