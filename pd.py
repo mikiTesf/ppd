@@ -9,7 +9,6 @@ import wget
 
 
 options = dict()
-FILE_TYPES = ['PDF', 'EPUB', 'JWPUB', 'RTF']
 
 HELP = """
 NAME
@@ -18,8 +17,9 @@ NAME
 
 SYNOPSIS
        python3.x pd.py [year=YEAR; default=current] [month=MONTH; default=current]
-                       [ftype={jwpub | pdf | epub | rtf}; default=jwpub] [lang=LANGUAGE_CODE; default=AM]
-                       [cont={true | false}; default=false] pub={g | w | wp | mwb}
+                       [ftype={jwpub | pdf | epub | rtf | brl}; default=jwpub]
+                       [lang=LANGUAGE_CODE; default=AM] [cont={true | false}; default=false]
+                       pub={g | w | wp | mwb}
        python3.x pd.py [-h|--help]
 
 DESCRIPTION
@@ -85,8 +85,7 @@ def collect_options(args_list):
         match = re.match('ftype=([a-z]+)', arg, re.IGNORECASE)
         if match:
             ftype = match.group(1).upper()
-            if ftype in FILE_TYPES:
-                options['ftype'] = ftype
+            options['ftype'] = ftype
             continue
 
         match = re.match('lang=([a-z]+)', arg, re.IGNORECASE)
