@@ -8,7 +8,7 @@ NAME
 SYNOPSIS
        python3.8 pd.py [--year=YEAR; default=current] [--month=MONTH; default=current]
                        [--ftype={jwpub | pdf | epub | rtf | brl}; default=jwpub]
-                       [--lang=LANGUAGE_CODE; default=AM] [--cont={true | false}; default=false]
+                       [--lang=LANGUAGE_CODE; default=AM] [--cont]
                        --pub={g | w | wp | mwb}
        python3.8 pd.py [-h | --help]
 
@@ -28,16 +28,15 @@ OPTIONS
        --ftype       The file format of the download. PDF, JWPUB, EPUB, BRL or RTF (defaults to JWPUB)
 
        --lang        The short language code of the target language (ex: AM for Amharic,
-                   E for English, etc. Defaults to AM)
+                     E for English, etc. Defaults to AM)
 
        --cont        Decides weather the script should continue downloading releases of the
-                   specified publication until the end of the year (can be set to true or
-                   false; defaults to false). See the last example below
+                     specified publication until the end of the year (See the last example below)
 
        --pub         The type of the publication to download. w, wp, g or mwb. It must always be supplied.
-                   If this option is not supplied this help will be shown instead
+                     If this option is not supplied this help will be shown instead
 
-       -h, --help  Display this help and exit
+       -h, --help    Display this help and exit
 
 EXAMPLES
        Executing the command below will not download any publication as `pub` is not supplied.
@@ -51,8 +50,8 @@ EXAMPLES
        % python3.8 pd.py --pub=wp --lang=a --ftype=epub
 
        This will download all Meeting Workbook issues from January 2018 up to December 2018
-       in the JWPUB format and the Amharic language (note that `cont` is set to true).
-       % python3.8 pd.py --pub=mwb --year=2018 --month=1 --ftype=jwpub --lang=am --cont=true
+       in the JWPUB format and the Amharic language (note that `--cont` is passed).
+       % python3.8 pd.py --pub=mwb --year=2018 --month=1 --ftype=jwpub --lang=am --cont
 ```
 
 It was written using Python 3.8 and the minimum version of Python 3 its compatible with is uncertain.

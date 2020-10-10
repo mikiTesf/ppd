@@ -18,7 +18,7 @@ NAME
 SYNOPSIS
        python3.8 pd.py [--year=YEAR; default=current] [--month=MONTH; default=current]
                        [--ftype={jwpub | pdf | epub | rtf | brl}; default=jwpub]
-                       [--lang=LANGUAGE_CODE; default=AM] [--cont={true | false}; default=false]
+                       [--lang=LANGUAGE_CODE; default=AM] [--cont]
                        --pub={g | w | wp | mwb}
        python3.8 pd.py [-h | --help]
 
@@ -38,16 +38,15 @@ OPTIONS
        --ftype       The file format of the download. PDF, JWPUB, EPUB, BRL or RTF (defaults to JWPUB)
 
        --lang        The short language code of the target language (ex: AM for Amharic,
-                   E for English, etc. Defaults to AM)
+                     E for English, etc. Defaults to AM)
 
        --cont        Decides weather the script should continue downloading releases of the
-                   specified publication until the end of the year (can be set to true or
-                   false; defaults to false). See the last example below
+                     specified publication until the end of the year (See the last example below)
 
        --pub         The type of the publication to download. w, wp, g or mwb. It must always be supplied.
-                   If this option is not supplied this help will be shown instead
+                     If this option is not supplied this help will be shown instead
 
-       -h, --help  Display this help and exit
+       -h, --help    Display this help and exit
 
 EXAMPLES
        Executing the command below will not download any publication as `pub` is not supplied.
@@ -61,8 +60,8 @@ EXAMPLES
        % python3.8 pd.py --pub=wp --lang=a --ftype=epub
 
        This will download all Meeting Workbook issues from January 2018 up to December 2018
-       in the JWPUB format and the Amharic language (note that `cont` is set to true).
-       % python3.8 pd.py --pub=mwb --year=2018 --month=1 --ftype=jwpub --lang=am --cont=true
+       in the JWPUB format and the Amharic language (note that `--cont` is passed).
+       % python3.8 pd.py --pub=mwb --year=2018 --month=1 --ftype=jwpub --lang=am --cont
 """
 
 
@@ -95,9 +94,9 @@ def collect_options(args_list):
             options['lang'] = match.group(1).upper()
             continue
 
-        match = re.match('--cont=(true|false)', arg, re.IGNORECASE)
+        match = re.match('--cont', arg, re.IGNORECASE)
         if match:
-            options['cont'] = match.group(1)
+            options['cont'] = True
             continue
 
         match = re.match('--pub=([a-z]+)', arg, re.IGNORECASE)
@@ -126,7 +125,7 @@ def get_download_links():
     download_links = []
     months = [options['month']]
 
-    if options['cont'] == 'true':
+    if options['cont']:
         months.extend(get_subsequent_months(months[0]))
 
     print('Getting download links...')
@@ -208,7 +207,7 @@ options['month'] = zero_pad_month(str(today.month))
 options['pub'] = None
 options['ftype'] = 'JWPUB'
 options['lang'] = 'AM'
-options['cont'] = 'false'
+options['cont'] = False
 
 # On the following line, the default options will be replaced with those passed by the user. If any of the options
 # supplied by the user are faulty, the default values set before `collect_options(...)` is called are used
