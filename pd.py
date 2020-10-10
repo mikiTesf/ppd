@@ -16,10 +16,10 @@ NAME
        Watchtower, Watchtower - Public or Meeting Workbook in any format from the command line
 
 SYNOPSIS
-       python3.8 pd.py [year=YEAR; default=current] [month=MONTH; default=current]
-                       [ftype={jwpub | pdf | epub | rtf | brl}; default=jwpub]
-                       [lang=LANGUAGE_CODE; default=AM] [cont={true | false}; default=false]
-                       pub={g | w | wp | mwb}
+       python3.8 pd.py [--year=YEAR; default=current] [--month=MONTH; default=current]
+                       [--ftype={jwpub | pdf | epub | rtf | brl}; default=jwpub]
+                       [--lang=LANGUAGE_CODE; default=AM] [--cont={true | false}; default=false]
+                       --pub={g | w | wp | mwb}
        python3.8 pd.py [-h | --help]
 
 DESCRIPTION
@@ -31,38 +31,38 @@ DESCRIPTION
 OPTIONS
        A summary of the available options is included below.
 
-       year        The year of the issue (defaults to the current year)
+       --year        The year of the issue (defaults to the current year)
 
-       month       The month of the issue (defaults to the current month)
+       --month       The month of the issue (defaults to the current month)
 
-       ftype       The file format of the download. PDF, JWPUB, EPUB, BRL or RTF (defaults to JWPUB)
+       --ftype       The file format of the download. PDF, JWPUB, EPUB, BRL or RTF (defaults to JWPUB)
 
-       lang        The short language code of the target language (ex: AM for Amharic,
+       --lang        The short language code of the target language (ex: AM for Amharic,
                    E for English, etc. Defaults to AM)
 
-       cont        Decides weather the script should continue downloading releases of the
+       --cont        Decides weather the script should continue downloading releases of the
                    specified publication until the end of the year (can be set to true or
                    false; defaults to false). See the last example below
 
-       pub         The type of the publication to download. w, wp, g or mwb. It must always be supplied.
+       --pub         The type of the publication to download. w, wp, g or mwb. It must always be supplied.
                    If this option is not supplied this help will be shown instead
 
        -h, --help  Display this help and exit
 
 EXAMPLES
        Executing the command below will not download any publication as `pub` is not supplied.
-       % python3.8 pd.py year=2010 month=2 ftype=pdf lang=e
+       % python3.8 pd.py --year=2010 --month=2 --ftype=pdf --lang=e
 
        This will download the Awake of February 2010 in the PDF format and the English language.
-       % python3.8 pd.py year=2010 month=2 ftype=pdf lang=e pub=g
+       % python3.8 pd.py --pub=g --year=2010 --month=2 --ftype=pdf --lang=e
 
        This will download the Public Watchtower of the current year and month in the EPUB
        format and the Arabic language.
-       % python3.8 pd.py ftype=epub lang=a pub=wp
+       % python3.8 pd.py --pub=wp --lang=a --ftype=epub
 
        This will download all Meeting Workbook issues from January 2018 up to December 2018
        in the JWPUB format and the Amharic language (note that `cont` is set to true).
-       % python3.8 pd.py year=2018 month=1 ftype=jwpub lang=am pub=mwb cont=true
+       % python3.8 pd.py --pub=mwb --year=2018 --month=1 --ftype=jwpub --lang=am --cont=true
 """
 
 
@@ -74,33 +74,33 @@ def zero_pad_month(month: str):
 
 def collect_options(args_list):
     for arg in args_list:
-        match = re.match('year=(\\d{4})', arg)
+        match = re.match('--year=(\\d{4})', arg)
         if match:
             options['year'] = match.group(1)
             continue
 
-        match = re.match('month=(\\d{1,2})', arg)
+        match = re.match('--month=(\\d{1,2})', arg)
         if match:
             options['month'] = zero_pad_month(match.group(1))
             continue
 
-        match = re.match('ftype=([a-z]+)', arg, re.IGNORECASE)
+        match = re.match('--ftype=([a-z]+)', arg, re.IGNORECASE)
         if match:
             ftype = match.group(1).upper()
             options['ftype'] = ftype
             continue
 
-        match = re.match('lang=([a-z]+)', arg, re.IGNORECASE)
+        match = re.match('--lang=([a-z]+)', arg, re.IGNORECASE)
         if match:
             options['lang'] = match.group(1).upper()
             continue
 
-        match = re.match('cont=(true|false)', arg, re.IGNORECASE)
+        match = re.match('--cont=(true|false)', arg, re.IGNORECASE)
         if match:
             options['cont'] = match.group(1)
             continue
 
-        match = re.match('pub=([a-z]+)', arg, re.IGNORECASE)
+        match = re.match('--pub=([a-z]+)', arg, re.IGNORECASE)
         if match:
             options['pub'] = match.group(1)
             continue
@@ -187,7 +187,7 @@ def download_publications(download_links: list):
         try:
             wget.download(link, out=download_path)
         except KeyboardInterrupt:
-            print('Download interrupted. Exiting...')
+            print('\nDownload interrupted. Exiting...')
             exit(0)
         print()  # An empty line inserted to prevent progress bars from overlapping over one another
 
