@@ -13,6 +13,9 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/mikiTesf/pd",
     packages=setuptools.find_packages(),
+    install_requires=[
+        'requests', 'wget'
+    ],
     classifiers=[
         "Programming Language :: Python :: 3.8",
         "License :: OSI Approved :: MIT License",

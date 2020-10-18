@@ -119,20 +119,20 @@ def main():
         formatter_class=argparse.RawTextHelpFormatter,
         allow_abbrev=False,
         epilog='''
-    examples:
-        Executing the command below will not download any publication as the publication is not supplied.
-        % python3.8 pd.py --year 2010 --month 2 --format pdf --lang e
+examples:
+    Executing the command below will not download any publication as the publication is not supplied.
+    % python3.8 pd.py --year 2010 --month 2 --format pdf --lang e
 
-        This will download the Awake of September 2010 in the PDF format and the English language.
-        % python3.8 pd.py g --year 2010 --month 9 --format pdf --lang e
+    This will download the Awake of September 2010 in the PDF format and the English language.
+    % python3.8 pd.py g --year 2010 --month 9 --format pdf --lang e
 
-        This will download the Public Watchtower of the current year and month in the EPUB
-        format and the Arabic language.
-        % python3.8 pd.py wp --format epub --lang a
+    This will download the Public Watchtower of the current year and month in the EPUB
+    format and the Arabic language.
+    % python3.8 pd.py wp --format epub --lang a
 
-        This will download all Meeting Workbook issues from January 2018 up to December 2018
-        in the JWPUB format and the Amharic language (note that `--cont` is passed).
-        % python3.8 pd.py mwb --year 2018 --month 1 --format jwpub --lang am --cont''')
+    This will download all Meeting Workbook issues from January 2018 up to December 2018
+    in the JWPUB format and the Amharic language (note that `--cont` is passed).
+    % python3.8 pd.py mwb --year 2018 --month 1 --format jwpub --lang am --cont''')
 
     arg_parser.version = 'version 0.2'
     arg_parser.add_argument('pub', type=str, choices=['w', 'wp', 'g', 'mwb'],
