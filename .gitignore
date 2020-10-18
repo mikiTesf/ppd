@@ -11,4 +11,4 @@ TODO
 # packaging files
 build/
 dist/
-pub_downloader.egg-info/
+ppd.egg-info/

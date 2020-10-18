@@ -4,14 +4,14 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="pub_downloader",
+    name="ppd",
     version="0.2",
     author="Mikyas Tesfamichael",
     author_email="mickyastesfamichael@gmail.com",
     description="Download 'periodic' Jehovah's Witnesses publications from the command line",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/mikiTesf/pd",
+    url="https://github.com/mikiTesf/ppd",
     packages=setuptools.find_packages(),
     install_requires=[
         'requests', 'wget'
@@ -23,8 +23,8 @@ setuptools.setup(
     ],
     entry_points={
         'console_scripts': [
-            'pub_downloader = pubd.pd:main'
+            'ppd = ppd.ppd:main'
         ]
     },
-    python_requires='>=3.6',
+    python_requires='>=3.6'
 )
