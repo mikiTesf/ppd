@@ -41,3 +41,6 @@ examples:
 ```
 
 It was written using Python 3.8 and the minimum version of Python 3 its compatible with is uncertain.
+
+#### Installation
+PD is available on [PyPi](https://pypi.org/project/pub_downloader/). You can install it with: `pip3 install pub_downloader`.

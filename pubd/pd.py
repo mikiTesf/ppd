@@ -108,31 +108,31 @@ class PubDownloader:
         print('done...', f"all downloads saved to '{abspath(download_path)}'")
 
 
-if __name__ == '__main__':
+def main():
     # noinspection PyTypeChecker
     arg_parser = argparse.ArgumentParser(
         prog='pd',
         description='''
-    Short for "Publication Downloader", pd.py is a script written using Python 3.8 that downloads the
-    publication specified. You can download any "periodic" JW publication - Awake, Watchtower - Public,
-    Watchtower - Study or Meeting Workbook in any format from the command line.''',
+        Short for "Publication Downloader", pd.py is a script written using Python 3.8 that downloads the
+        publication specified. You can download any "periodic" JW publication - Awake, Watchtower - Public,
+        Watchtower - Study or Meeting Workbook in any format from the command line.''',
         formatter_class=argparse.RawTextHelpFormatter,
         allow_abbrev=False,
         epilog='''
-examples:
-    Executing the command below will not download any publication as the publication is not supplied.
-    % python3.8 pd.py --year 2010 --month 2 --format pdf --lang e
+    examples:
+        Executing the command below will not download any publication as the publication is not supplied.
+        % python3.8 pd.py --year 2010 --month 2 --format pdf --lang e
 
-    This will download the Awake of September 2010 in the PDF format and the English language.
-    % python3.8 pd.py g --year 2010 --month 9 --format pdf --lang e
+        This will download the Awake of September 2010 in the PDF format and the English language.
+        % python3.8 pd.py g --year 2010 --month 9 --format pdf --lang e
 
-    This will download the Public Watchtower of the current year and month in the EPUB
-    format and the Arabic language.
-    % python3.8 pd.py wp --format epub --lang a
+        This will download the Public Watchtower of the current year and month in the EPUB
+        format and the Arabic language.
+        % python3.8 pd.py wp --format epub --lang a
 
-    This will download all Meeting Workbook issues from January 2018 up to December 2018
-    in the JWPUB format and the Amharic language (note that `--cont` is passed).
-    % python3.8 pd.py mwb --year 2018 --month 1 --format jwpub --lang am --cont''')
+        This will download all Meeting Workbook issues from January 2018 up to December 2018
+        in the JWPUB format and the Amharic language (note that `--cont` is passed).
+        % python3.8 pd.py mwb --year 2018 --month 1 --format jwpub --lang am --cont''')
 
     arg_parser.version = 'version 0.2'
     arg_parser.add_argument('pub', type=str, choices=['w', 'wp', 'g', 'mwb'],
@@ -144,12 +144,12 @@ examples:
                             default=str(today.year))
     arg_parser.add_argument('-l', '--lang', type=str, default='AM',
                             help='''The short language code of the target language
-(ex: AM for Amharic, E for English, etc. Defaults to AM)''')
+    (ex: AM for Amharic, E for English, etc. Defaults to AM)''')
     arg_parser.add_argument('-f', '--format', type=str, default='JWPUB',
                             help='The file format of the download. PDF, JWPUB, EPUB, BRL or RTF (defaults to JWPUB)')
     arg_parser.add_argument('-c', '--cont', action='store_true',
                             help='''Decides weather the script should continue downloading releases of the
-specified publication until the end of the year (See the last example below)''')
+    specified publication until the end of the year (See the last example below)''')
     arg_parser.add_argument('-v', '--version', action='version')
 
     parsed_args = arg_parser.parse_args()
@@ -159,3 +159,7 @@ specified publication until the end of the year (See the last example below)''')
         parsed_args.lang, parsed_args.format, parsed_args.cont)
     links = pub_downloader.get_download_links()
     pub_downloader.download_publications(links)
+
+
+if __name__ == '__main__':
+    main()

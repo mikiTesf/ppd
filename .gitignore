@@ -8,3 +8,7 @@ sample_mwb/
 *rtf
 *zip
 TODO
+# packaging files
+build/
+dist/
+pub_downloader.egg-info/
