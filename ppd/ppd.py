@@ -12,25 +12,24 @@ import wget
 
 class PPD:
 
-    def __init__(self, pub: str, month: int, year: int, lang: str, file_format: str, cont: bool):
+    def __init__(self, pub: str, month: int, year: int, lang: str, file_format: str, cont: bool, link_only: bool):
         self.pub = pub
         self.month = self.zero_pad_month(str(month))
-        self.year = year
+        self.year = str(year).zfill(4)
         self.lang = lang.upper()
         self.format = file_format.upper()
         self.cont = cont
+        self.link_only = link_only
 
     @staticmethod
     def zero_pad_month(month: str):
-        if len(month) == 1:
-            month = '0' + month
-        return month
+        return month.zfill(2)
 
     def get_subsequent_months(self, current_month: str):
         current_month = int(current_month)
         subsequent_months = []
 
-        if (current_month > 12) or (current_month < 1):
+        if (current_month < 1) or (current_month > 12):
             return subsequent_months  # which will be empty at this point
 
         while (current_month + 1) < 13:
@@ -81,10 +80,13 @@ class PPD:
         return download_links
 
     def download_publications(self, download_links: list):
+        if self.link_only:
+            exit(0)
+
         if len(download_links) == 0:
             exit('No download links found. Exiting...')
 
-        download_path = join('downloads', self.pub, self.lang, str(self.year))
+        download_path = join(self.pub, self.lang, str(self.year))
         makedirs(download_path, exist_ok=True)
 
         print('###################################################################################################')
@@ -103,6 +105,11 @@ class PPD:
             except KeyboardInterrupt:
                 exit(
                     f"\nDownload interrupted. Check '{abspath(download_path)}' for downloaded publications. Exiting...")
+            except ConnectionResetError:
+                exit(
+                    f"The connection was reset by the remote server. \033[93m'{file_name}' not downloaded\033[0m. "
+                    f"Skipping...")
+                continue
             print()  # An empty line inserted to prevent progress bars from overlapping over one another
 
         print('done...', f"all downloads saved to '{abspath(download_path)}'")
@@ -113,9 +120,9 @@ def main():
     arg_parser = argparse.ArgumentParser(
         prog='ppd',
         description='''
-    Short for "Periodic Publication Downloader", ppd is a script written using Python 3.8 that downloads the "periodic"
-    Jehovah's Witness publication specified. You can download Awakes, Watchtowers (Public and Study) or Meeting Workbooks
-    in any format from the command line.''',
+    Short for "Periodic Publication Downloader", ppd is a script written using Python 3.8 that downloads the
+    "periodic" Jehovah's Witness publication specified. You can download Awakes, Watchtowers (Public and Study)
+    or Meeting Workbooks in any format from the command line.''',
         formatter_class=argparse.RawTextHelpFormatter,
         allow_abbrev=False,
         epilog='''
@@ -132,9 +139,31 @@ examples:
 
     This will download all Meeting Workbook issues from January 2018 up to December 2018
     in the JWPUB format and the Amharic language (note that `--cont` is passed).
-    % ppd mwb --year 2018 --month 1 --format jwpub --lang am --cont''')
+    % ppd mwb --year 2018 --month 1 --format jwpub --lang am --cont
 
-    arg_parser.version = 'version 0.2'
+more on options:
+    Long options can have an equal sign between them and their values (--format=pdf). Also, short options can
+    be used inplace of long ones. Here is the short option equivalent of the last example above:
+    % ppd mwb -y 2018 -m 1 -f jwpub -l am -c
+
+downloads:
+    ppd will create a directory hierarchy in the current working directory in which downloaded publications
+    will be saved. The hierarchy follows the following pattern:
+                        <publication-type>/<publication-language>/<publication-year>
+
+    For example if you download all public Watchtowers of 2020 in the Amharic language, this is what the file
+    tree for the downloads will look like:
+                        wp/
+                        └── AM
+                            └── 2020
+                                ├── wp_AM_202001.extn
+                                ├── wp_AM_202005.extn
+                                └── wp_AM_202009.extn
+
+author:
+    Mikyas Tesfamichael (mickyastesfamichael@gmail.com)''')
+
+    arg_parser.version = 'version 0.2.1'
     arg_parser.add_argument('pub', type=str, choices=['w', 'wp', 'g', 'mwb'],
                             help='The type of the publication to download')
     today = datetime.today()
@@ -148,15 +177,17 @@ examples:
     arg_parser.add_argument('-f', '--format', type=str, default='JWPUB',
                             help='The file format of the download. PDF, JWPUB, EPUB, BRL or RTF (defaults to JWPUB)')
     arg_parser.add_argument('-c', '--cont', action='store_true',
-                            help='''Decides weather the script should continue downloading releases of the
-specified publication until the end of the year (See the last example below)''')
+                            help='''Continue downloading releases of the specified publication until
+the end of the year (See the last example below)''')
+    arg_parser.add_argument('-o', '--link-only', action='store_true',
+                            help='''Only show download links (publications will not be downloaded)''')
     arg_parser.add_argument('-v', '--version', action='version')
 
     parsed_args = arg_parser.parse_args()
 
     ppd = PPD(
-        parsed_args.pub, parsed_args.month, parsed_args.year,
-        parsed_args.lang, parsed_args.format, parsed_args.cont)
+        parsed_args.pub, parsed_args.month, parsed_args.year, parsed_args.lang,
+        parsed_args.format, parsed_args.cont, parsed_args.link_only)
     links = ppd.get_download_links()
     ppd.download_publications(links)
 

@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="ppd",
-    version="0.2",
+    version="0.2.1",
     author="Mikyas Tesfamichael",
     author_email="mickyastesfamichael@gmail.com",
     description="Download 'periodic' Jehovah's Witnesses publications from the command line",
@@ -17,7 +17,7 @@ setuptools.setup(
         'requests', 'wget'
     ],
     classifiers=[
-        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.6",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
