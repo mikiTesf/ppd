@@ -12,14 +12,91 @@ import wget
 
 class PPD:
 
-    def __init__(self, pub: str, month: int, year: int, lang: str, file_format: str, cont: bool, link_only: bool):
-        self.pub = pub
-        self.month = self.zero_pad_month(str(month))
-        self.year = str(year).zfill(4)
-        self.lang = lang.upper()
-        self.format = file_format.upper()
-        self.cont = cont
-        self.link_only = link_only
+    def __init__(self):
+        # noinspection PyTypeChecker
+        self.arg_parser = argparse.ArgumentParser(
+            prog='ppd',
+            description='''
+    Short for "Periodic Publication Downloader", ppd is a script written using Python 3.8 that downloads the
+    "periodic" Jehovah's Witness publication specified. You can download Awakes, Watchtowers (Public and Study)
+    or Meeting Workbooks in any format from the command line.''',
+            formatter_class=argparse.RawTextHelpFormatter,
+            allow_abbrev=False,
+            epilog='''
+examples:
+    Executing the command below will not download any publication as the publication is not specified.
+    % ppd --year=2010 --month=2 --format=pdf --lang=e
+
+    This will download the Awake of September 2010 in the PDF format and the English language.
+    % ppd g --year=2010 --month=9 --format=pdf --lang=e
+
+    This will download the Public Watchtower of the current year and month in the EPUB format
+    and the Arabic language.
+    % ppd wp --format=epub --lang=a
+
+    This will download all Meeting Workbook issues from January 2018 up to December 2018
+    in the JWPUB format and the Amharic language (note that `--cont` is passed).
+    % ppd mwb --year=2018 --month=1 --format=jwpub --lang=am --cont
+
+downloads:
+    ppd will create a directory hierarchy in the current working directory in which downloaded publications
+    will be saved. The hierarchy follows the following pattern:
+                        <publication-type>/<publication-language>/<publication-year>
+
+    For example if you download all public Watchtowers of 2020 in the Amharic language, this is what
+    the file tree for the downloads will look like:
+                        wp/
+                        └── AM
+                            └── 2020
+                                ├── wp_AM_202001.extn
+                                ├── wp_AM_202005.extn
+                                └── wp_AM_202009.extn
+
+more on options:
+    Short options can be used inplace of long ones. Here is the short option equivalent of the
+    last example above:
+    % ppd mwb -y 2018 -m 1 -f jwpub -l am -c
+
+    Also, you may omit the equal sign between long options and their values (ex. --format jwpub).
+
+author:
+    Mikyas Tesfamichael (mickyastesfamichael@gmail.com)''')
+
+        self.arg_parser.version = 'version 0.2.1'
+        # The options in the following argument group apply only to periodic publications
+        self.arg_parser.add_argument('pub', type=str, choices=['w', 'wp', 'g', 'mwb'],
+                                     help='The type of the publication to download')
+        today = datetime.today()
+        self.arg_parser.add_argument('-m', '--month', type=int,
+                                     help='The month of the issue (defaults to the current month)',
+                                     default=str(today.month))
+        self.arg_parser.add_argument('-y', '--year', type=int,
+                                     help='The year of the issue (defaults to the current year)',
+                                     default=str(today.year))
+        self.arg_parser.add_argument('-c', '--cont', action='store_true',
+                                     help='''Continue downloading releases of the specified publication until
+        the end of the year (See the last example below)''')
+        # The options in the following argument group apply only to books
+        '''Implement the code for book downloading arguments and options'''
+        # The following options either apply to all kinds of publications ppd can download or to none at all
+        self.arg_parser.add_argument('-l', '--lang', type=str, default='AM',
+                                     help='''The short language code of the target language
+        (ex: AM for Amharic, E for English, etc. Defaults to AM)''')
+        self.arg_parser.add_argument('-f', '--format', type=str, default='JWPUB',
+                                     help='The file format of the download. PDF, JWPUB, EPUB, BRL or RTF (defaults to JWPUB)')
+        self.arg_parser.add_argument('-o', '--link-only', action='store_true',
+                                     help='''Only show download links (publications will not be downloaded)''')
+        self.arg_parser.add_argument('-v', '--version', action='version')
+
+        parsed_args = self.arg_parser.parse_args()
+
+        self.pub = parsed_args.pub
+        self.month = self.zero_pad_month(str(parsed_args.month))
+        self.year = str(parsed_args.year).zfill(4)
+        self.lang = parsed_args.lang.upper()
+        self.format = parsed_args.format.upper()
+        self.cont = parsed_args.cont
+        self.link_only = parsed_args.link_only
 
     @staticmethod
     def zero_pad_month(month: str):
@@ -116,80 +193,8 @@ class PPD:
 
 
 def main():
-    # noinspection PyTypeChecker
-    arg_parser = argparse.ArgumentParser(
-        prog='ppd',
-        description='''
-    Short for "Periodic Publication Downloader", ppd is a script written using Python 3.8 that downloads the
-    "periodic" Jehovah's Witness publication specified. You can download Awakes, Watchtowers (Public and Study)
-    or Meeting Workbooks in any format from the command line.''',
-        formatter_class=argparse.RawTextHelpFormatter,
-        allow_abbrev=False,
-        epilog='''
-examples:
-    Executing the command below will not download any publication as the publication is not specified.
-    % ppd --year 2010 --month 2 --format pdf --lang e
-
-    This will download the Awake of September 2010 in the PDF format and the English language.
-    % ppd g --year 2010 --month 9 --format pdf --lang e
-
-    This will download the Public Watchtower of the current year and month in the EPUB
-    format and the Arabic language.
-    % ppd wp --format epub --lang a
-
-    This will download all Meeting Workbook issues from January 2018 up to December 2018
-    in the JWPUB format and the Amharic language (note that `--cont` is passed).
-    % ppd mwb --year 2018 --month 1 --format jwpub --lang am --cont
-
-more on options:
-    Long options can have an equal sign between them and their values (--format=pdf). Also, short options can
-    be used inplace of long ones. Here is the short option equivalent of the last example above:
-    % ppd mwb -y 2018 -m 1 -f jwpub -l am -c
-
-downloads:
-    ppd will create a directory hierarchy in the current working directory in which downloaded publications
-    will be saved. The hierarchy follows the following pattern:
-                        <publication-type>/<publication-language>/<publication-year>
-
-    For example if you download all public Watchtowers of 2020 in the Amharic language, this is what the file
-    tree for the downloads will look like:
-                        wp/
-                        └── AM
-                            └── 2020
-                                ├── wp_AM_202001.extn
-                                ├── wp_AM_202005.extn
-                                └── wp_AM_202009.extn
-
-author:
-    Mikyas Tesfamichael (mickyastesfamichael@gmail.com)''')
-
-    arg_parser.version = 'version 0.2.1'
-    arg_parser.add_argument('pub', type=str, choices=['w', 'wp', 'g', 'mwb'],
-                            help='The type of the publication to download')
-    today = datetime.today()
-    arg_parser.add_argument('-m', '--month', type=int, help='The month of the issue (defaults to the current month)',
-                            default=str(today.month))
-    arg_parser.add_argument('-y', '--year', type=int, help='The year of the issue (defaults to the current year)',
-                            default=str(today.year))
-    arg_parser.add_argument('-l', '--lang', type=str, default='AM',
-                            help='''The short language code of the target language
-(ex: AM for Amharic, E for English, etc. Defaults to AM)''')
-    arg_parser.add_argument('-f', '--format', type=str, default='JWPUB',
-                            help='The file format of the download. PDF, JWPUB, EPUB, BRL or RTF (defaults to JWPUB)')
-    arg_parser.add_argument('-c', '--cont', action='store_true',
-                            help='''Continue downloading releases of the specified publication until
-the end of the year (See the last example below)''')
-    arg_parser.add_argument('-o', '--link-only', action='store_true',
-                            help='''Only show download links (publications will not be downloaded)''')
-    arg_parser.add_argument('-v', '--version', action='version')
-
-    parsed_args = arg_parser.parse_args()
-
-    ppd = PPD(
-        parsed_args.pub, parsed_args.month, parsed_args.year, parsed_args.lang,
-        parsed_args.format, parsed_args.cont, parsed_args.link_only)
-    links = ppd.get_download_links()
-    ppd.download_publications(links)
+    ppd = PPD()
+    ppd.download_publications(ppd.get_download_links())
 
 
 if __name__ == '__main__':
