@@ -1,12 +1,14 @@
 import setuptools
 
+from ppd import __version__, __author__
+
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
     name="ppd",
-    version="0.2.1",
-    author="Mikyas Tesfamichael",
+    version=__version__,
+    author=__author__,
     author_email="mickyastesfamichael@gmail.com",
     description="Download 'periodic' Jehovah's Witnesses publications from the command line",
     long_description=long_description,
@@ -23,7 +25,7 @@ setuptools.setup(
     ],
     entry_points={
         'console_scripts': [
-            'ppd = ppd.ppd:main'
+            'ppd = ppd.__main__:main'
         ]
     },
     python_requires='>=3.6'
