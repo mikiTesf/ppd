@@ -40,20 +40,6 @@ examples:
     in the JWPUB format and the Amharic language (note that `--cont` is passed).
     % ppd mwb --year=2018 --month=1 --format=jwpub --lang=am --cont
 
-downloads:
-    If you pass --hierarchy (-r), ppd will create a directory hierarchy in the current working directory
-    in which downloaded publications will be saved. The hierarchy follows the following pattern:
-                    <publication-type>/<publication-language>/<publication-year>
-
-    For example if you download all public Watchtowers of 2020 in the Amharic language, this is what
-    the file tree for the downloads will look like:
-                        wp/
-                        └── AM
-                            └── 2020
-                                ├── wp_AM_202001.extn
-                                ├── wp_AM_202005.extn
-                                └── wp_AM_202009.extn
-
 more on options:
     Short options can be used in place of long ones. Here is the short option equivalent of the
     last example above:
@@ -85,8 +71,18 @@ author:
         self.arg_parser.add_argument('-o', '--link-only', action='store_true',
                                      help='''Only show download links (publications will not be downloaded)''')
         self.arg_parser.add_argument('-r', '--hierarchy', action='store_true',
-                                     help='''Create a directory hierarchy into which downloads will be saved
-(see the note under 'downloads:')''')
+                                     help='''Create a directory hierarchy in the current working directory in which downloaded
+publications will be saved. The hierarchy follows the following pattern:
+        <publication-type>/<publication-language>/<publication-year>/
+
+For example if you download all public Watchtowers of 2020 in the Amharic language,
+this is what the file tree for the downloads will look like:
+                wp/
+                └── AM
+                    └── 2020
+                        ├── wp_AM_202001.extn
+                        ├── wp_AM_202005.extn
+                        └── wp_AM_202009.extn''')
         self.arg_parser.add_argument('-c', '--cont', action='store_true',
                                      help='''Continue fetching links for releases of the specified publication
 until the end of the year (see the last example below)''')
