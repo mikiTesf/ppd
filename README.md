@@ -3,9 +3,9 @@
 ```
 usage: ppd [-h] [-m MONTH] [-y YEAR] [-l LANG] [-f FORMAT] [-o] [-r] [-c] [-v] pub
 
-    Short for "Periodic Publication Downloader", ppd is a script written using Python 3.8 that downloads the
-    "periodic" Jehovah's Witness publication specified. You can download Awakes, Watchtowers (Public and Study)
-    or Meeting Workbooks in any format from the command line.
+    Short for "Periodic Publication Downloader", ppd is a script written using Python 3.8 that downloads
+    the "periodic" Jehovah's Witness publication specified. You can download Awakes, Watchtowers (Public
+    and Study) or Meeting Workbooks in any format from the command line.
 
 positional arguments:
   pub                   The type of publication to download (w | wp | g | mwb)
